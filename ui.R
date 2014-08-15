@@ -8,10 +8,10 @@ shinyUI(pageWithSidebar(
                 label = "Select year to compare countries",
                 choices = sort(unique(dat2m$year)),
                 selected = 2011),
-    selectInput(inputId = "country",
-                label = "Select country to compare years",
-                choices = sort(unique(dat2m$country)),
-                selected = "Canada")
+#     selectInput(inputId = "country",
+#                 label = "Select country to compare years",
+#                 choices = sort(unique(dat2m$country)),
+#                 selected = "Canada")
   ),
   
   mainPanel(

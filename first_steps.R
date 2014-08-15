@@ -1,3 +1,13 @@
+library(XML)
+table <- readHTMLTable("madrid.xls")
+library (plyr)
+df <- ldply (table, data.frame)
+df
+write.csv2(file="output_madrid.csv", x=df)
+
+# data.frame(t(sapply(table,c)))
+
+
 require(devtools)
 install_github("rCharts", "ramnathv")
 

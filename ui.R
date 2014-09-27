@@ -1,21 +1,26 @@
 require(rCharts)
 options(RCHART_LIB = 'polycharts')
-shinyUI(pageWithSidebar(
-  headerPanel("Percentage of Employed who are Senior Managers, by Sex"),
+library(shiny)
+
+# Define UI for application that draws a histogram
+shinyUI(fluidPage(
   
-  sidebarPanel(
-    selectInput(inputId = "year",
-                label = "Select year to compare countries",
-                choices = sort(unique(dat2m$year)),
-                selected = 2011),
-#     selectInput(inputId = "country",
-#                 label = "Select country to compare years",
-#                 choices = sort(unique(dat2m$country)),
-#                 selected = "Canada")
-  ),
+  # Application title
+  titlePanel("Hello Shiny!"),
   
-  mainPanel(
-    showOutput("chart1", "polycharts"),
-    showOutput("chart2", "polycharts")
+  # Sidebar with a slider input for the number of bins
+  sidebarLayout(
+    sidebarPanel(
+      sliderInput("bins",
+                  "Number of bins:",
+                  min = 1,
+                  max = 50,
+                  value = 30)
+    ),
+    
+    # Show a plot of the generated distribution
+    mainPanel(
+      plotOutput("distPlot")
+    )
   )
 ))

@@ -9,3 +9,9 @@
 .RData
 .Rproj.user
 deploy.R
+
+# About Shinyapps deployment
+shinyapps
+
+# Other files
+shit.R

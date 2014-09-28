@@ -9,27 +9,52 @@ library(grid)
 library(RCurl)
 library(plyr)
 library(markdown)
+library(plotGoogleMaps)
+library(sp)
 
-coord_madrid <- c(lon = -3.688810, lat = 40.420088)
-madrid = get_map(location = coord_madrid, zoom = 12, maptype = 'roadmap')
-madrid_map = ggmap(madrid)
-madrid_map
+# meuse example
+if (exists("meuse")) {
+  rm(meuse)
+  data(meuse)
+  coordinates(meuse)<-~x+y # convert to SPDF
+  proj4string(meuse) <- CRS('+init=epsg:28992')
+  meuse_map <- plotGoogleMaps(meuse, filename = 'meuseMap.html', openMap = F)
+}
+
+# google map with our coordinates
+if (!exists("df_traffic_measure_points")) {
+  print ("loading data file with measure traffic points...")
+  data_folder <- 'data'
+  file1 <- paste(data_folder, 'PUNTOS_MEDIDA_TRAFICO_2014_01_23_FIXED.csv', sep = '/')
+  l_traffic_measure_points <- read.csv2(file1)
+  df_traffic_measure_points <- as.data.frame(l_traffic_measure_points)
+  df_traffic_measure_points$Lat <- as.numeric(df_traffic_measure_points$Lat)
+  df_traffic_measure_points$Lon <- as.numeric(df_traffic_measure_points$Long)
+#   coordinates(df_traffic_measure_points) = ~x+y
+#   sample <- df_traffic_measure_points[1:50,]
+  coordinates(df_traffic_measure_points) = ~Lat+Lon
+  proj4string(df_traffic_measure_points) <- CRS("+init=epsg:3042")
+  sample <- df_traffic_measure_points[1:50,]
+  m <- plotGoogleMaps(sample, filename = 'sample_new_coords.html', openMap = F)
+  m <- plotGoogleMaps(df_traffic_measure_points, filename = 'new_coords.html', openMap = F)
+}
+
+# get madrid static map
+if (!exists("madrid_map")) {
+  coord_madrid <- c(lon = -3.688810, lat = 40.420088)
+  madrid = get_map(location = coord_madrid, zoom = 12, maptype = 'roadmap')
+#   madrid = get_googlemap(location = coord_madrid, zoom = 12, maptype = 'roadmap', size=(640, 640))
+  madrid_map <- ggmap(madrid)
+#   Lat <- sample$Lat
+#   Lon <- sample$Lon
+#   madrid_map + geom_point(data=sample, aes(x=Lat, y=Lon), size=5)
+  
+}
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
     
-  output$map <- renderPlot({
-#     map.base <- get_googlemap(
-#       as.matrix(temp.geocode),
-#       maptype = input$type, ## Map type as defined above (roadmap, terrain, satellite, hybrid)
-#       markers = temp.geocode,
-#       zoom = input$zoom,            ## 14 is just about right for a 1-mile radius
-#       color = temp.color,   ## "color" or "bw" (black & white)
-#       scale = temp.scale   ## Set it to 2 for high resolution output
-#     )
-#     map.final <- map.base
-#     print(map.final)
-    
+  output$madrid_static_Plot <- renderPlot({    
     print(madrid_map)
   })
   output$distPlot <- renderPlot({
@@ -38,5 +63,22 @@ shinyServer(function(input, output) {
     
     # draw the histogram with the specified number of bins
     hist(x, breaks = bins, col = 'darkgray', border = 'white')
+  })
+  # meuse example
+  output$googleMapPlotMeuse <- renderUI({
+    tags$iframe(
+      srcdoc = paste(readLines('meuseMap.html'), collapse = '\n'),
+      width = "100%",
+      height = "400px"
+    )
+  })
+  # OUR DATA
+  output$googleMapPlot <- renderUI({
+#     proj4string(df_traffic_measure_points) = CRS("+init=epsg:28992")
+    tags$iframe(
+      srcdoc = paste(readLines('myMap1.html'), collapse = '\n'),
+      width = "100%",
+      height = "600px"
+    )
   })
 })

@@ -9,7 +9,7 @@ shinyUI(page(
   headerPanel("MAD traffic!"),
   
   # Sidebar with a slider input for the number of bins
-#   sidebarPanel(""),
+  sidebarPanel(""),
   mainPanel( 
       plotOutput("madrid_static_Plot")
 #       plotOutput("googleMapPlotMeuse")

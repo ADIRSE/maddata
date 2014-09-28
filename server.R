@@ -14,7 +14,6 @@ library(sp)
 
 # meuse example
 if (exists("meuse")) {
-  rm(meuse)
   data(meuse)
   coordinates(meuse)<-~x+y # convert to SPDF
   proj4string(meuse) <- CRS('+init=epsg:28992')
@@ -31,12 +30,11 @@ if (!exists("df_traffic_measure_points")) {
   df_traffic_measure_points$Lat <- as.numeric(df_traffic_measure_points$Lat)
   df_traffic_measure_points$Lon <- as.numeric(df_traffic_measure_points$Long)
 #   coordinates(df_traffic_measure_points) = ~x+y
-#   sample <- df_traffic_measure_points[1:50,]
   coordinates(df_traffic_measure_points) = ~Lat+Lon
   proj4string(df_traffic_measure_points) <- CRS("+init=epsg:3042")
   sample <- df_traffic_measure_points[1:50,]
   m <- plotGoogleMaps(sample, filename = 'sample_new_coords.html', openMap = F)
-  m <- plotGoogleMaps(df_traffic_measure_points, filename = 'new_coords.html', openMap = F)
+  n <- plotGoogleMaps(df_traffic_measure_points, filename = 'new_coords.html', openMap = F)
 }
 
 # get madrid static map
@@ -56,13 +54,6 @@ shinyServer(function(input, output) {
     
   output$madrid_static_Plot <- renderPlot({    
     print(madrid_map)
-  })
-  output$distPlot <- renderPlot({
-    x    <- faithful[, 2]  # Old Faithful Geyser data
-    bins <- seq(min(x), max(x), length.out = input$bins + 1)
-    
-    # draw the histogram with the specified number of bins
-    hist(x, breaks = bins, col = 'darkgray', border = 'white')
   })
   # meuse example
   output$googleMapPlotMeuse <- renderUI({

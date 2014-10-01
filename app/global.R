@@ -2,6 +2,7 @@ require(RJSONIO); require(rCharts); require(RColorBrewer); require(httr)
 library(ggplot2)
 library(ggmap)
 
+## @knitr getData
 getTrafficPoints <- function() {
   num_decimals <- 3
   # load traffic measure  points
@@ -15,6 +16,7 @@ getTrafficPoints <- function() {
   
 }
 
+## @knitr getData
 getAirQualityPoints <- function() {
   num_decimals <- 3
   # load air quality measure points
@@ -28,6 +30,7 @@ getAirQualityPoints <- function() {
 }
 
 
+## @knitr plotMap
 plotMap <- function(num_measure_points = nrow(df_traffic_measure_points), 
                     width = 1600, 
                     height = 800){

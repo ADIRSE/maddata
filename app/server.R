@@ -1,5 +1,4 @@
 require(shiny)
-require(leafletR)
 require(rCharts)
 
 

@@ -139,7 +139,9 @@ plotMap <- function(num_measure_points = nrow(df_traffic_measure_points),
   #   another example
   #   names(data_) <- c('lat', 'lng', 'fillColor')
   #   map$geocsv(data_)
-  
+#   print (leafletR::toGeoJSON(data_, 
+#                              #                             lat.lon = c('Lat', 'Long'),
+#                              dest=output_geofile))
   map$geoJson(
         leafletR::toGeoJSON(data_, 
 #                             lat.lon = c('Lat', 'Long'),

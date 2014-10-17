@@ -54,6 +54,7 @@ tfrPlot$chart(tooltipContent = "#! function(key, x, y){
 tfrPlot
 
 #############
+
 names(iris) = gsub("\\.", "", names(iris))
 p1 <- rPlot('SepalWidth', 'SepalLength', data = iris, color = "Species", 
             facet = "Species", type = 'point')

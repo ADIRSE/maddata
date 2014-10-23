@@ -5,6 +5,40 @@ require(httr)
 library(ggplot2)
 library(ggmap)
 require(downloader)
+require(rJava)
+library(RImpala)
+rimpala.init(libs ="lib/impala/impala-jdbc-0.5-2/")
+
+getBOAData <- function(url){
+  temp <- getURL(URLencode(url), ssl.verifypeer = FALSE)
+  data <- fromJSON(temp, simplifyVector=FALSE)  
+}
+
+connectImpala <- function(){
+  # connect
+  rimpala.connect("54.171.4.239", port = "21050", principal = "user=guest;password=maddata")
+  rimpala.usedatabase("bod_pro")
+  
+}
+
+disconnectImpala <- function(){
+  rimpala.close()  
+}
+
+# identif <- 'PM20742'
+getImpalaData <- function(identif = 'PM20742'){
+  #   data <- rimpala.query("SELECT * FROM md_trafico_madrid LIMIT 100")
+  query <- paste("SELECT * FROM md_trafico_madrid WHERE identif = ",
+     "\"",
+     identif,
+     "\"",
+     " LIMIT 100",
+    sep = '')
+  data <- rimpala.query(query)
+#   typeof(data)
+#   head(data)
+  data
+}
 
 ## @knitr getData
 getData <- function(network = 'citibikenyc'){
@@ -78,7 +112,7 @@ getAirQualityPoints <- function() {
 
 ## @ knitr getKMLData
 getKMLData <- function () {
-  require(downloader)
+
   kml_url = 'http://datos.madrid.es/egob/catalogo/202088-0-trafico-camaras.kml'
   kml_file = '/data/202088-0-trafico-camaras.kml'
   if (file.exists(kml_file)) {

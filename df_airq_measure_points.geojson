@@ -1,0 +1,341 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "4",
+        "Estacion": "17",
+        "Direccion": "18",
+        "Lat1": "12",
+        "Long1": "19"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.712247,40.423853]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "8",
+        "Estacion": "10",
+        "Direccion": "8",
+        "Lat1": "11",
+        "Long1": "10"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.682319,40.421564]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "11",
+        "Estacion": "2",
+        "Direccion": "7",
+        "Lat1": "16",
+        "Long1": "9"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.677356,40.451475]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "16",
+        "Estacion": "1",
+        "Direccion": "2",
+        "Lat1": "14",
+        "Long1": "5"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.639233,40.440047]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "17",
+        "Estacion": "24",
+        "Direccion": "12",
+        "Lat1": "1",
+        "Long1": "20"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.713322,40.347139]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "18",
+        "Estacion": "11",
+        "Direccion": "9",
+        "Lat1": "5",
+        "Long1": "22"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.731853,40.394781]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "24",
+        "Estacion": "5",
+        "Direccion": "24",
+        "Lat1": "10",
+        "Long1": "23"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.747347,40.419356]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "27",
+        "Estacion": "3",
+        "Direccion": "13",
+        "Lat1": "20",
+        "Long1": "1"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.580031,40.476928]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "35",
+        "Estacion": "18",
+        "Direccion": "20",
+        "Lat1": "9",
+        "Long1": "16"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.703172,40.419208]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "36",
+        "Estacion": "14",
+        "Direccion": "6",
+        "Lat1": "7",
+        "Long1": "6"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.645306,40.407947]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "38",
+        "Estacion": "7",
+        "Direccion": "14",
+        "Lat1": "15",
+        "Long1": "17"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.707128,40.445544]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "39",
+        "Estacion": "4",
+        "Direccion": "3",
+        "Lat1": "21",
+        "Long1": "18"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.711542,40.478228]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "40",
+        "Estacion": "20",
+        "Direccion": "1",
+        "Lat1": "4",
+        "Long1": "7"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.651522,40.388153]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "47",
+        "Estacion": "13",
+        "Direccion": "11",
+        "Lat1": "6",
+        "Long1": "12"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.686825,40.398114]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "48",
+        "Estacion": "6",
+        "Direccion": "10",
+        "Lat1": "13",
+        "Long1": "15"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.690367,40.439897]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "49",
+        "Estacion": "15",
+        "Direccion": "16",
+        "Lat1": "8",
+        "Long1": "11"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.682583,40.414444]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "50",
+        "Estacion": "16",
+        "Direccion": "17",
+        "Lat1": "19",
+        "Long1": "13"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.688769,40.465572]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "54",
+        "Estacion": "9",
+        "Direccion": "4",
+        "Lat1": "2",
+        "Long1": "4"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.612117,40.372933]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "55",
+        "Estacion": "23",
+        "Direccion": "23",
+        "Lat1": "17",
+        "Long1": "2"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.580747,40.462531]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "56",
+        "Estacion": "19",
+        "Direccion": "19",
+        "Lat1": "3",
+        "Long1": "21"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.718728,40.384964]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "57",
+        "Estacion": "21",
+        "Direccion": "22",
+        "Lat1": "22",
+        "Long1": "8"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.660503,40.491708]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "58",
+        "Estacion": "8",
+        "Direccion": "5",
+        "Lat1": "24",
+        "Long1": "24"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.774611,40.518058]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "59",
+        "Estacion": "12",
+        "Direccion": "15",
+        "Lat1": "18",
+        "Long1": "3"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.609072,40.465250]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "Id": "60",
+        "Estacion": "22",
+        "Direccion": "21",
+        "Lat1": "23",
+        "Long1": "14"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.689761,40.500589]
+      }
+    }
+  ]
+}

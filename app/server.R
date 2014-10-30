@@ -8,11 +8,12 @@ shinyServer(function(input, output) {
   
   output$map_container <- renderMap({
 #     getKMLData()
-    plotMap(500)
+#     plotMap(500)
+    plotMap(input$num_traffic_points)
   })
   output$series_container1 <- renderChart2({
-#     getSeriesChart()
     getTrafficSeriesChart()
+#     getTrafficSeriesChart(input$traf_point)
   })
 
   output$series_container2 <- renderChart({

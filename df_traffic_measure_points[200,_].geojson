@@ -1,0 +1,20 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "IDELEM.N.10.0": "3600",
+        "TIPO_ELEM.N.10.0": "494",
+        "COD_CENT.C.254": "3535",
+        "NOMBRE.C.254": "2668",
+        "COORD_X.N.21.6": "2632",
+        "COORD_Y.N.21.6": "1131"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [-3.664,40.406]
+      }
+    }
+  ]
+}

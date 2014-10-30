@@ -5,9 +5,9 @@ require(httr)
 library(ggplot2)
 library(ggmap)
 require(downloader)
+library(RCurl)
 require(rJava)
 library(RImpala)
-rimpala.init(libs ="lib/impala/impala-jdbc-0.5-2/")
 
 getBOAData <- function(url){
   temp <- getURL(URLencode(url), ssl.verifypeer = FALSE)
@@ -15,7 +15,9 @@ getBOAData <- function(url){
 }
 
 connectImpala <- function(){
+  rimpala.init(libs ="lib/impala/impala-jdbc-0.5-2/")
   # connect
+  rimpala.usedatabase("bod_pro")
   rimpala.connect("54.171.4.239", port = "21050", principal = "user=guest;password=maddata")
   rimpala.usedatabase("bod_pro")
   
@@ -26,14 +28,33 @@ disconnectImpala <- function(){
 }
 
 # identif <- 'PM20742'
-getImpalaData <- function(identif = 'PM20742'){
-  #   data <- rimpala.query("SELECT * FROM md_trafico_madrid LIMIT 100")
-  query <- paste("SELECT * FROM md_trafico_madrid WHERE identif = ",
-     "\"",
-     identif,
-     "\"",
-     " LIMIT 100",
-    sep = '')
+# "SELECT * FROM md_trafico_madrid WHERE identif = \"PM20742\" AND fecha > \"2014-09-15\" LIMIT 100 LIMIT 100 LIMIT 100"
+getImpalaQuery <- function(identif = 0, fecha = 0){
+
+  query <- "SELECT * FROM md_trafico_madrid "  
+  
+  if (identif != 0) {
+    query <- paste(query, "WHERE identif = ", 
+                   "\"",
+                   identif,
+                   "\"",         
+                   sep = '')
+  }
+  if (fecha != 0) {   
+    query <- paste(query, 
+                   " AND fecha > ",
+                   "\"",
+                   fecha,
+                   "\"",
+                  sep = '')
+  }
+
+  query <- paste(query, " ORDER BY fecha", sep = '')
+  query <- paste(query, " LIMIT 100", sep = '')
+  query
+}
+
+getImpalaData <- function(query){
   data <- rimpala.query(query)
 #   typeof(data)
 #   head(data)
@@ -64,22 +85,38 @@ getData <- function(network = 'citibikenyc'){
   })
 }
 
-# test <- function() {
-#   data(quakes)
-#   toGeoJSON(data=quakes, name="quakes", dest=tempdir(), lat.lon=c(1,2))
-#   path <- toGeoJSON(data=quakes)
-#   toGeoJSON(data=quakes[1:99,], dest=tempdir(), name="quakes")
-#   
-#   
-#   print("------------")
-#   print(leafletR::toGeoJSON(getTrafficPoints(2), lat.lon = c('Lat', 'Long')))
-#   print(data = toGeoJSON(getTrafficPoints(2), lat.lon = c('Lat', 'Long')))
-#   print("------------")
-#   print(toGeoJSON(getData('citibikenyc')))
-#   print("------------")
-# }
 
-## @knitr getData
+getTrafficPointsChoicesImpala <- function(limit = 0) {
+  #   connectImpala()
+  choices <- rimpala.query("SELECT DISTINCT identif FROM md_trafico_madrid LIMIT 100")
+  #   order by rand()
+  #   disconnectImpala()
+  choices
+}
+
+
+getTrafficPointsChoices <- function(limit = 0) {
+  num_decimals <- 3
+  # load traffic measure  points
+  input_file <- paste(getwd(), '/app/data/PUNTOS_MEDIDA_TRAFICO_2014_01_23_FIXED.csv', sep='')
+  l_traffic_measure_points <- read.csv2(input_file)
+  head(l_traffic_measure_points)
+  df_traffic_measure_points <- as.data.frame(l_traffic_measure_points)
+  names(df_traffic_measure_points)
+  names(df_traffic_measure_points) <- c('id', 'tipo', 'code', 'name', 'x', 'y', 'long', 'lat')
+#   names <- df_traffic_measure_points$NOMBRE.C.254
+#   names <- df_traffic_measure_points$IDELEM.N.10.0
+#   choices <- df_traffic_measure_points$name
+  str(df_traffic_measure_points)
+  choices <- df_traffic_measure_points$id
+# choices <- df_traffic_measure_points[,c(1, 4)]
+  
+  if (limit == 0)
+    return (choices)
+  else
+    return (choices[1:limit,])
+}
+
 getTrafficPoints <- function(limit = 0) {
   num_decimals <- 3
   # load traffic measure  points
@@ -168,14 +205,14 @@ plotMap <- function(num_measure_points = nrow(df_traffic_measure_points),
   output_geofile <- paste(getwd(), '/data/', sep='')
 
   #   citybikes example
-  #   data_ <- getData(network); center_ <- getCenter(network, networks)popuppopup
+  #   data_ <- getData(network); center_ <- getCenter(network, networks)
   #   center_ <- getCenter(network, networks)    
   #   another example
   #   names(data_) <- c('lat', 'lng', 'fillColor')
   #   map$geocsv(data_)
 #   print (leafletR::toGeoJSON(data_, 
 #                              #                             lat.lon = c('Lat', 'Long'),
-#                              dest=output_geofile))
+#                              dest=))
   map$geoJson(
         leafletR::toGeoJSON(data_, 
 #                             lat.lon = c('Lat', 'Long'),
@@ -194,15 +231,15 @@ plotMap <- function(num_measure_points = nrow(df_traffic_measure_points),
                           } !#")
 #   )
 
-#   # append markers and popup texts
-#   for(i in 1:num_measure_points) {
-#     html_text <- paste("<h6> Punto de medida del tráfico </h6>")
-#     html_text <- paste(html_text, "<p>",  df_traffic_measure_points$NOMBRE.C.254[i]," </p>")
-#     map$marker(c(df_traffic_measure_points$Lat[i], 
-#                   df_traffic_measure_points$Long[i]), 
-#                 bindPopup = html_text)
-#   }
-# 
+  # append markers and popup texts
+  for(i in 1:num_measure_points) {
+    html_text <- paste("<h6> Punto de medida del tráfico </h6>")
+    html_text <- paste(html_text, "<p>",  df_traffic_measure_points$NOMBRE.C.254[i]," </p>")
+    map$marker(c(df_traffic_measure_points$Lat[i], 
+                  df_traffic_measure_points$Long[i]), 
+                bindPopup = html_text)
+  }
+
 #   # append markers and popup texts
 #   for(i in 1:nrow(df_airq_measure_points)) {
 #     html_text <- paste("<h6> Estación de calidad del Aire </h6>")
@@ -214,8 +251,40 @@ plotMap <- function(num_measure_points = nrow(df_traffic_measure_points),
 # #                  df_airq_measure_points$Long2[i]))
 #   }
 
-
   map$enablePopover(TRUE)
   map$fullScreen(TRUE)
   return(map)
+}
+
+
+# SERIES CHART FOR ONE TRAFFIC MEASURE POINT
+getTrafficSeriesChart <- function (traf_point = 'PM20742') { 
+  #   traf_point <- '3551'
+  print("traf_point")
+  print(traf_point)
+  print("===========")
+
+  query <- getImpalaQuery(traf_point)
+  #   query <- getImpalaQuery('PM20742', '2014-07-15')  
+  print(query)
+
+  # get data from impala
+  #   connectImpala()
+  data <- getImpalaData(query)
+  #   disconnectImpala()
+  
+  # get chart
+  m1 <- mPlot(x = 'fecha', y = c('vmed', 'carga'), type = 'Line',
+              data = data)
+  m1$set(pointSize = 0, lineWidth = 1)
+  m1
+  
+  
+  #   mytooltip = "function(item){return item.identif + '\n' + item.fecha + '\n' + item.vmed}"
+  #   p1 <- rPlot(fecha ~ carga, data = data, type = 'point', 
+  #             size = list(const = 2), 
+  #             color = list(const = '#888'), 
+  #             tooltip = mytooltip)
+  #   p1$print('chart1')
+  #   p1
 }

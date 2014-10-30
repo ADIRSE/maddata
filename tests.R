@@ -1,3 +1,23 @@
+
+##########
+# OpenStreetMapR
+library(devtools)
+install_github('greentheo/OpenStreetMapR')
+library("OpenStreetMapR")
+
+df = data.frame(lat=runif(10, 38,40), long=-runif(10, 104,106), 
+                size=runif(10)*20, color=sample(rainbow(3), 10, replace=TRUE),
+                line=sample(1:3, 10,replace=TRUE))
+OSMMap(df)
+OSMMap(df, size='size', color='color')
+
+dualMap = (addLayers(OSMMap(df, size='size', color='color'),
+                     linePlot))
+plot(dualMap)
+<!--begin.rcode results='asis'
+(print(OSMMap(df, size='size', color='color')))
+end.rcode-->
+  
 ##########
 # BOA
 library(RCurl)
@@ -77,14 +97,21 @@ rimpala.init(libs ="lib/impala/impala-jdbc-0.5-2/")
 rimpala.connect("54.171.4.239", port = "21050", principal = "user=guest;password=maddata")
 rimpala.usedatabase("bod_pro")
 
-//DROP SI YA EXISTE
-rimpala.query("DROP TABLE [nombre_tabla]")
+# //DROP SI YA EXISTE
+# rimpala.query("DROP TABLE [nombre_tabla]")
 
 rimpala.showdatabases()
 rimpala.showtables()
 rimpala.describe("md_trafico_madrid") #Describes la tabla de trafico
 prueba <- rimpala.query("SELECT * FROM md_trafico_madrid LIMIT 100")
 prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = 'PM20742' LIMIT 100")
+prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE fecha = '2014-08-20 01:00:00' LIMIT 100")
+
+prueba <- rimpala.query("SELECT DISTINCT identif FROM md_trafico_madrid LIMIT 100")
+prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"PM20742\" ORDER BY fecha LIMIT 100")
+prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"PM3856\" ORDER BY fecha LIMIT 100")
+prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"3856\" ORDER BY fecha LIMIT 100")
+# 3846 3847 3848 3849 3850 3851 3852 3853 3854 3855 3856
 rimpala.close() #cierras la conexion
 
 rimpala.query("select * from information_schema")

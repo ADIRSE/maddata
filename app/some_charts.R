@@ -7,6 +7,8 @@ getSeriesChart <- function () {
   typeof(economics)
   head(economics)
   econ <- transform(economics, date = as.character(date))
+  str(economics)
+  str(econ)
   #   typeof(econ)
   m1 <- mPlot(x = 'date', y = c('psavert', 'uempmed'), type = 'Line',
               data = econ)
@@ -15,37 +17,19 @@ getSeriesChart <- function () {
 
 }
 
-getTrafficSeriesChart <- function () {
-  url <- 'http://datune.maddata.es:9090/BigOpenApi/probarRecurso?dsTabla=md_trafico_madrid'
+#   url <- 'http://datune.maddata.es:9090/BigOpenApi/probarRecurso?dsTabla=md_trafico_madrid'
 #   data <- getBOAData(url)
-  data <- as.data.frame(data$Result)
+#   data <- as.data.frame(data$Result)
+#   typeof(data)
 #   head(data)
-  parsedData <- transform(data, date = as.character(fecha))
+#   str(data)
+#   str(data$Result)
+#   str(y)
+#   data[1]
+#   parsedData <- transform(data, date = as.character(fecha))
 #   head(parsedData, n = 2)
-  
-  connectImpala()
-  data <- getImpalaData('PM20742')
-  disconnectImpala()
-  data$vmed
-  data$carga
-  m1 <- mPlot(x = 'fecha', y = c('vmed', 'carga'), type = 'Line',
-              data = data)
-  m1$set(pointSize = 0, lineWidth = 1)
-  m1
-  
-#   library(HairEyeColor)
-#   haireye <- as.data.frame(HairEyeColor)
-#   dat <- subset(haireye, Sex == "Female" & Eye == "Blue")
-#   p1 <- mPlot(x = 'Hair', y = list('Freq'), data = dat, type = 'Bar', labels = list("Count"))
 
-  mytooltip = "function(item){return item.identif + '\n' + item.fecha + '\n' + item.vmed}"
-  p1 <- rPlot(fecha ~ carga, data = data, type = 'point', 
-            size = list(const = 2), 
-            color = list(const = '#888'), 
-            tooltip = mytooltip)
-  p1$print('chart1')
-  p1
-}
+
 getNVD3test <- function () {
     hair_eye_male <- subset(as.data.frame(HairEyeColor), Sex == "Male")
     n1 <- nPlot(Freq ~ Hair, group = "Eye", data = hair_eye_male, type = 'multiBarChart')

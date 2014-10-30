@@ -12,8 +12,8 @@ shinyServer(function(input, output) {
     plotMap(input$num_traffic_points)
   })
   output$series_container1 <- renderChart2({
-    getTrafficSeriesChart()
-#     getTrafficSeriesChart(input$traf_point)
+#     getTrafficSeriesChart()
+    getTrafficSeriesChart(input$traf_point)
   })
 
   output$series_container2 <- renderChart({

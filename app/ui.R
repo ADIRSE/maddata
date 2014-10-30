@@ -4,7 +4,9 @@ require(rCharts)
 connectImpala()
 
 # traffic_points_choices <- getTrafficPointsChoices()
-traffic_points_choices <- getTrafficPointsChoicesImpala()
+traffic_points_choices <- getTrafficPointsChoicesImpala()[[1]]
+# traffic_points_choices
+# typeof(traffic_points_choices)
 
 shinyUI(pageWithSidebar( 
     headerPanel("MADtraffic"),
@@ -20,7 +22,8 @@ shinyUI(pageWithSidebar(
                      start = "2013-01-01",
                      end = "2014-09-30"),
       
-      selectInput("traf_point", "Punto medida de tráfico", as.list(traffic_points_choices)),
+#       selectInput("traf_point", "Punto medida de tráfico", as.list(traffic_points_choices)),
+      selectInput("traf_point", "Punto medida de tráfico", traffic_points_choices),
       
       selectInput("select", label = h3("Select box"), 
                   choices = list("Choice 1" = 1, "Choice 2" = 2,

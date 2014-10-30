@@ -37,7 +37,7 @@ getNVD3test <- function () {
 }
 
 getScatterChart <- function (input){
-names(iris) = gsub("\\.", "", names(iris))
+  names(iris) = gsub("\\.", "", names(iris))
   p1 <- rPlot(input$x, input$y, data = iris, color = "Species", 
               facet = "Species", type = 'point')
   p1$addParams(dom = 'myChart')

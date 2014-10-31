@@ -97,6 +97,7 @@ rimpala.init(libs ="lib/impala/impala-jdbc-0.5-2/")
 rimpala.connect("54.171.4.239", port = "21050", principal = "user=guest;password=maddata")
 rimpala.usedatabase("bod_pro")
 
+
 # //DROP SI YA EXISTE
 # rimpala.query("DROP TABLE [nombre_tabla]")
 

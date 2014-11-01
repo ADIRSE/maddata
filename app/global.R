@@ -8,10 +8,16 @@ require(downloader)
 library(RCurl)
 require(rJava)
 library(RImpala)
-# rimpala.init(libs ="lib/impala/impala-jdbc-0.5-2/")
-# rimpala.connect("54.171.4.239", port = "21050", principal = "user=guest;password=maddata")
-# rimpala.usedatabase("bod_pro")
 
+#######################
+# GLOBAL SETTINGS
+#######################
+PATH_RIMPALA_LIB <- "../lib/impala/impala-jdbc-0.5-2/"
+
+
+#######################
+# GLOBAL FUNCS
+#######################
 getBOAData <- function(url){
   temp <- getURL(URLencode(url), ssl.verifypeer = FALSE)
   data <- fromJSON(temp, simplifyVector=FALSE)  
@@ -32,8 +38,10 @@ disconnectImpala <- function(){
 
 # identif <- 'PM20742'
 # "SELECT * FROM md_trafico_madrid WHERE identif = \"PM20742\" AND fecha > \"2014-09-15\" LIMIT 100 LIMIT 100 LIMIT 100"
-getImpalaQuery <- function(identif = 0, fecha = 0){
+getImpalaQuery <- function(identif = 0, date_start = 0, date_end = 0){
 
+  limit <- 100
+  
   query <- "SELECT * FROM md_trafico_madrid "  
   
   if (identif != 0) {
@@ -43,17 +51,29 @@ getImpalaQuery <- function(identif = 0, fecha = 0){
                    "\"",         
                    sep = '')
   }
-  if (fecha != 0) {   
+  if (date_start != 0) {
     query <- paste(query, 
                    " AND fecha > ",
                    "\"",
-                   fecha,
+                   date_start,
                    "\"",
                   sep = '')
   }
-
+  if (date_end != 0) {   
+    query <- paste(query, 
+                   " AND fecha < ",
+                   "\"",
+                   date_end,
+                   "\"",
+                   sep = '')
+  }
+  
   query <- paste(query, " ORDER BY fecha", sep = '')
-  query <- paste(query, " LIMIT 100", sep = '')
+  
+  if (limit != 0) {   
+    query <- paste(query, " LIMIT ", as.character(limit) ,sep = '')
+  }
+  
   query
 }
 
@@ -65,28 +85,28 @@ getImpalaData <- function(query){
 }
 
 ## @knitr getData
-getData <- function(network = 'citibikenyc'){
-  require(httr)
-  url = sprintf('http://api.citybik.es/%s.json', network)
-  bike = content(GET(url))
-  lapply(bike, function(station){within(station, { 
-    fillColor = cut(
-      as.numeric(bikes)/(as.numeric(bikes) + as.numeric(free)), 
-      breaks = c(0, 0.20, 0.40, 0.60, 0.80, 1), 
-      labels = brewer.pal(5, 'RdYlGn'),
-      include.lowest = TRUE
-    ) 
-    popup = iconv(whisker::whisker.render(
-      '<b>{{name}}</b><br>
-        <b>Free Docks: </b> {{free}} <br>
-         <b>Available Bikes:</b> {{bikes}}
-        <p>Retreived At: {{timestamp}}</p>'
-    ), from = 'latin1', to = 'UTF-8')
-    latitude = as.numeric(lat)/10^6
-    longitude = as.numeric(lng)/10^6
-    lat <- lng <- NULL})
-  })
-}
+# getData <- function(network = 'citibikenyc'){
+#   require(httr)
+#   url = sprintf('http://api.citybik.es/%s.json', network)
+#   bike = content(GET(url))
+#   lapply(bike, function(station){within(station, { 
+#     fillColor = cut(
+#       as.numeric(bikes)/(as.numeric(bikes) + as.numeric(free)), 
+#       breaks = c(0, 0.20, 0.40, 0.60, 0.80, 1), 
+#       labels = brewer.pal(5, 'RdYlGn'),
+#       include.lowest = TRUE
+#     ) 
+#     popup = iconv(whisker::whisker.render(
+#       '<b>{{name}}</b><br>
+#         <b>Free Docks: </b> {{free}} <br>
+#          <b>Available Bikes:</b> {{bikes}}
+#         <p>Retreived At: {{timestamp}}</p>'
+#     ), from = 'latin1', to = 'UTF-8')
+#     latitude = as.numeric(lat)/10^6
+#     longitude = as.numeric(lng)/10^6
+#     lat <- lng <- NULL})
+#   })
+# }
 
 
 getTrafficPointsChoicesImpala <- function(limit = 0) {
@@ -112,7 +132,6 @@ getTrafficPointsChoices <- function(limit = 0) {
 #   choices <- df_traffic_measure_points$name
 
   choices <- df_traffic_measure_points$id
-# choices <- df_traffic_measure_points[,c(1, 4)]
   
   if (limit == 0)
     return (choices)
@@ -137,7 +156,6 @@ getTrafficPoints <- function(limit = 0) {
     return (df_traffic_measure_points[1:limit,])
 }
 
-## @knitr getData
 getAirQualityPoints <- function() {
   num_decimals <- 3
   # load air quality measure points
@@ -150,7 +168,6 @@ getAirQualityPoints <- function() {
   return (df_airq_measure_points)
 }
 
-## @ knitr getKMLData
 getKMLData <- function () {
 
   kml_url = 'http://datos.madrid.es/egob/catalogo/202088-0-trafico-camaras.kml'
@@ -177,7 +194,6 @@ getCenter <- function(nm, networks){
   return(list(lat = lat, lng = lng))
 }
 
-## @knitr plotMap
 plotMap <- function(num_measure_points = nrow(df_traffic_measure_points), 
                     width = 1600, 
                     height = 800){
@@ -261,14 +277,15 @@ plotMap <- function(num_measure_points = nrow(df_traffic_measure_points),
 
 
 # SERIES CHART FOR ONE TRAFFIC MEASURE POINT
-getTrafficSeriesChart <- function (traf_point = 'PM20742') { 
-  #   traf_point <- '3551'
-  print("traf_point")
-  print(traf_point)
-  print("===========")
+getTrafficSeriesChart <- function (traf_point = 'PM20742', date_start, date_end) { 
+#   print(traf_point)
+#   print(date_start)
+#   print(date_end)
+#   print("===========")
 
-  query <- getImpalaQuery(traf_point)
-  #   query <- getImpalaQuery('PM20742', '2014-07-15')  
+  #   query <- getImpalaQuery(traf_point)
+  query <- getImpalaQuery(traf_point, date_start, date_end)  
+  #   query <- getImpalaQuery(traf_point, date_start)
   print(query)
 
   # get data from impala

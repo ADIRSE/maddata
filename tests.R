@@ -112,6 +112,11 @@ prueba <- rimpala.query("SELECT DISTINCT identif FROM md_trafico_madrid LIMIT 10
 prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"PM20742\" ORDER BY fecha LIMIT 100")
 prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"PM3856\" ORDER BY fecha LIMIT 100")
 prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"3856\" ORDER BY fecha LIMIT 100")
+prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"41054\" AND fecha > \"2012-12-31\" AND fecha < \"2014-09-29\" ORDER BY fecha LIMIT 100")
+
+prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"41054\" AND fecha > \"2012-12-31\" ORDER BY fecha LIMIT 100")
+prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"41054\" AND fecha > \"2012-12-17\" ORDER BY fecha LIMIT 100")
+
 # 3846 3847 3848 3849 3850 3851 3852 3853 3854 3855 3856
 rimpala.close() #cierras la conexion
 

@@ -18,16 +18,16 @@ shinyUI(pageWithSidebar(
                   min = 10, max = 1000, value = 200),
       
       # Range of dates to study data
-      dateRangeInput("date_range", "Date range:",
-                     start = "2013-01-01",
+      dateRangeInput("date_range", "Rango de fechas:",
+                     start = "2014-01-01",
                      end = "2014-09-30"),
       
 #       selectInput("traf_point", "Punto medida de tráfico", as.list(traffic_points_choices)),
-      selectInput("traf_point", "Punto medida de tráfico", traffic_points_choices),
-      
-      selectInput("select", label = h3("Select box"), 
-                  choices = list("Choice 1" = 1, "Choice 2" = 2,
-                                 "Choice 3" = 3), selected = 1)
+      selectInput("traf_point", "Punto medida de tráfico", traffic_points_choices)
+
+#       selectInput("select", label = h3("Select box"), 
+#                   choices = list("Choice 1" = 1, "Choice 2" = 2,
+#                                  "Choice 3" = 3), selected = 1)
       
    ),
     

@@ -33,11 +33,18 @@ shinyUI(pageWithSidebar(
     
     mainPanel(
       tabsetPanel(
-        tabPanel("Puntos de medida del tráfico y calidad del aire", chartOutput("map_container", 'leaflet')),
-        tabPanel("Tráfico en 1 pto de medida", chartOutput("series_container1", 'morris')),
-        tabPanel("Prueba", chartOutput("series_container2", 'nvd3')),
-        tabPanel("Prueba", chartOutput("series_container3", 'polycharts')),
-        tabPanel("Prueba", chartOutput("series_container4", 'xcharts'))
+        tabPanel("Puntos de medida del tráfico y calidad del aire", chartOutput("tab_container_1", 'leaflet')),
+        tabPanel("Tráfico en 1 pto de medida", chartOutput("tab_container_2", 'morris')),
+        tabPanel("Prueba", chartOutput("tab_container_3", 'nvd3')),
+        
+#         tabPanel("Prueba", chartOutput("tab_container_4", 'polycharts')),
+        tabPanel("tab_container_4", plotOutput("tab_container_4")),
+
+#         tabPanel("Prueba", chartOutput("tab_container_5", 'xcharts'))
+        tabPanel("tab_container_5", plotOutput("tab_container_5")),
+#         tabPanel("tab_container_5", dataTableOutput("tab_container_5")),
+
+        tabPanel("Sobre nosotros", includeMarkdown("docs/about_us.md"))
       )
     )
 ))

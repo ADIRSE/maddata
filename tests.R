@@ -1,4 +1,120 @@
+##########
+##########
 
+# OPENAIR
+# install.packages("openair", dep=TRUE)
+library(openair)
+
+# eng_sites <- airbaseFindCode(country = c("GB"), site.type = "traffic", city = "London")
+# airbaseFindCode(site = "madrid")
+# airbaseInfo(code = "ES0113A", instrument = FALSE)
+# airbaseInfo(code = "ES0113A", instrument = TRUE)
+
+madrid_aq_sites <- airbaseInfo(code = airbaseFindCode(country = c("ES"), 
+                                                      city = "madrid"), 
+                    instrument = FALSE)
+
+# head(madrid_aq_sites, n = 15)
+# length(madrid_aq_sites)
+# str(madrid_aq_sites)
+# summary(madrid_aq_sites)
+
+# importing data
+as.character(madrid_aq_sites[1,1])
+
+importAirbase(site = "ES0113A", year = 2000:2001, pollutant = NA)
+importAirbase(site = "ES0113A", year = 2000)
+
+head(importAirbase(site = "gb0620a", year = 2012:2012, pollutant = NA,
+              add = c("country", "site.type"), splice = FALSE, local = NA))
+
+# FUNC OF AQ DATA
+getAirBaseData <- function (station, year) {  
+  ab_data <- importAirbase(site = station, year = year:year, pollutant = NA, add = c("country", "site.type"), splice = FALSE, local = NA)
+  csv_filename <- paste('app/data/airq/openair/',
+                        station, 
+                        '_', 
+                        as.character(year), 
+                        '.csv', 
+                        sep = '')
+  write.csv2(ab_data, file = csv_filename)
+}
+
+# 
+# sapply(as.character(madrid_aq_sites[1:4,1]), 
+#        function(x) getAirBaseData(x)
+# )
+# sapply(as.character(madrid_aq_sites[,1]), 
+#        function(x) getAirBaseData(x)
+# )
+
+# ab_list <- importAirbase(site = "ES0115A", year = 2010:2010, pollutant = NA, add = c("country", "site.type"), splice = FALSE, local = NA)
+# ab_list <- importAirbase(site = "ES0115A", year = 2014:2014, pollutant = NA, add = c("country", "site.type"), splice = FALSE, local = NA)
+# write.csv2(ab_list, file = "ES0115A_2010.csv")
+
+# download yearly data from Madrid stations
+getAirBaseData("ES0115A", 2010)
+getAirBaseData("ES0115A", 2012)
+getAirBaseData("ES0115A", 2013)
+
+for (i in madrid_aq_sites[,1] ) {
+  sapply(seq(2012, 2014), function(x) getAirBaseData(i, x))
+}
+
+
+
+
+# airbaseStats(statistic = "Mean", pollutant = "no2", avg.time = "auto",
+#              code = NULL, site.type = c("background", "traffic", "industrial",
+#                                         "unknown"), year = 1969:2012, data.cap = 0, add = c("country", "lat",
+#                                                                                             "lon", "site.type"))
+
+# calculate monthly means
+means <- aggregate(mydata["nox"], format(mydata["date"],"%Y-%m"),
+                   mean, na.rm = TRUE)
+# derive the proper sequence of dates
+means$date <- seq(min(mydata$date), max(mydata$date), length = nrow(means))
+# plot the means
+plot(means$date, means[, "nox"], type = "l")
+
+plot(as.factor(format(mydata$date, "%Y-%m")), mydata$no2, col = "lightpink")
+polarPlot(mydata, cols = "jet")
+# Sys.setenv(TZ = "Etc/GMT-1")
+
+
+# load openair data if not loaded already
+data(mydata)
+str(mydata)
+mydata[1:200,]
+# basic use, single pollutant
+scatterPlot(mydata[1:200,], x = "nox", y = "no2")
+# scatterPlot by year
+scatterPlot(mydata[1:200,], x = "nox", y = "no2", type = "year")
+# scatterPlot by day of the week, removing key at bottom
+scatterPlot(mydata[1:200,], x = "nox", y = "no2", type = "weekday", key =
+              FALSE)
+
+# example of the use of continuous where colour is used to show
+# different levels of a third (numeric) variable
+# plot daily averages and choose a filled plot symbol (pch = 16)
+# select only 2004
+## Not run: dat2004 <- selectByDate(mydata, year = 2004)
+scatterPlot(dat2004, x = "nox", y = "no2", z = "co", avg.time = "day", pch = 16)
+## End(Not run)
+# show linear fit, by year
+## Not run: scatterPlot(mydata, x = "nox", y = "no2", type = "year", smooth =
+# FALSE, linear = TRUE)
+## End(Not run)
+# do the same, but for daily means...
+## Not run: scatterPlot(mydata, x = "nox", y = "no2", type = "year", smooth =
+# FALSE, linear = TRUE, avg.time = "day")
+## End(Not run)
+# log scales
+## Not run: scatterPlot(mydata, x = "nox", y = "no2", type = "year", smooth =
+# FALSE, linear = TRUE, avg.time = "day", log.x = TRUE, log.y = TRUE)
+## End(Not run)
+
+##########
 ##########
 # OpenStreetMapR
 library(devtools)

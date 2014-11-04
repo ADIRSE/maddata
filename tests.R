@@ -1,8 +1,106 @@
+
 ##########
+library(ggplot2)
+
+AQdata <- read.table('/home/alonso/Documentos/madtraffic/datos/sep_mo14_mio.csv', sep=',', dec = ".", header=T)
+AQdata <- read.table(paste(getwd(), '/app/data/airq/sep_mo14.csv', sep=''), sep=',', dec = ".", header=T)
+
+PlotFun <- function(Cod, p, m){ 
+  print(str(subset(AQdata, Code == Cod & Par == p & mes == m)))
+  plot_data <- subset(AQdata, Code == Cod & Par == p & mes == m)
+  
+  p <- ggplot(data=AQdata, aes(x=as.numeric(plot_data$hora), y=plot_data$Value, group=as.numeric(plot_data$dia), color=plot_data$dia)) + geom_line() + geom_hline(yintercept=200, color='red') + xlim(1, 24)
+  p <- p + xlab('Hora') + ylab('Nivel NO2 [mg/m3]') + theme(legend.position="none")
+  print(p)
+}
+
+PlotFun(28079004, 1, 9)
+
+##########
+txt2Csv <- function(input_file = 'app/data/airq/sep_mo14.txt', output_file = 'app/data/airq/sep_mo14.csv') { 
+  
+  dataAQ <- read.fwf(file = input_file, 
+                     c(8,2,2,2,2,2,2,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1,5,-1),
+                     col.names=c("Code","Par","Tec","Pe","ano","mes","dia","hora1","hora2","hora3","hora4","hora5","hora6","hora7","hora8","hora9","hora10","hora11","hora12","hora13","hora14","hora15","hora16","hora17","hora18","hora19","hora20","hora21","hora22","hora23","hora24"),
+                     strip.white=TRUE) 
+  dataAQ2 <- data.frame(matrix(nrow = nrow(dataAQ)*24, 
+                               ncol = 7))
+  k=as.numeric(1)
+  for (i in 1:nrow(dataAQ)) {
+    for (j in 8:31) {
+      dataAQ2[k,1] <- dataAQ[i, 'Code']
+      dataAQ2[k,2] <- dataAQ[i, 'Par']
+      #dataAQ2[k,3] <- paste(as.character(dataAQ[i, 'dia']), as.character(dataAQ[i, 'mes']), as.character(2000+dataAQ[i, 'año']), as.character(j-7))
+      dataAQ2[k,3] <- dataAQ[i, 'dia']
+      dataAQ2[k,4] <- dataAQ[i, 'mes']
+      dataAQ2[k,5] <- 2000 + dataAQ[i, 'ano']
+      dataAQ2[k,6] <- j-7
+      dataAQ2[k,7] <- dataAQ[i, j]
+      k <- k+1
+    }
+  }
+  
+  names(dataAQ2)=c("Code","Par","dia","mes","ano","hora","Value")
+  
+  write.table(dataAQ2, file = output_file, 
+              sep = ",", 
+              dec = ".", 
+              col.names = TRUE, 
+              row.names = FALSE)
+
+}
+
+txt2Csv()
+month.name[1:5]
+months_es <- c('ene','feb','mar', 'abr', 
+  'may', 'jun','jul', 'ago', 'sep', 'oct','nov', 
+  'dec') 
+
+# GENERADOR DE CSVs de AIRQ DATA
+for(m in months_es[1:8]){
+# for(m in month.name[1:5]){
+  input <- paste('app/data/airq/', 
+                  m,
+                  '_mo14.txt', sep = '')
+  output <- paste('app/data/airq/', 
+                 m,
+                 '_mo14.csv', sep = '')
+  print(input)
+  print(output)
+  txt2Csv(input, output)  
+}
+
+txt2Csv('app/data/airq/ago_mo14.txt', 'app/data/airq/ago_mo14.csv')
+
+##########
+
+install_github("jcheng5/leaflet-shiny")
+library(leaflet)
+map <- createLeafletMap("1", "myMap")
+map$setView(0, 0, 8)
+
+##########
+install.packages("lib/CartoDB_1.4.tar.gz", repos=NULL, type="source")
+# install_github("cartodb-r", "Vizzuality")
+library(RCurl)
+library(RJSONIO)
+library(CartoDB)
+
+# Setup your connection
+cartodb_account_name = ""
+cartodb(cartodb_account_name)
+
+# You can quickly test that your connection works
+cartodb.test()
+
+CartoDB::map(regions="madrid", lwd=0.05, lty=1)
+points(data$the_geom_x, data$the_geom_y, col="red")
+
+
 ##########
 
 # OPENAIR
-# install.packages("openair", dep=TRUE)
+install.packages("openair", dep=TRUE)
 library(openair)
 
 # eng_sites <- airbaseFindCode(country = c("GB"), site.type = "traffic", city = "London")
@@ -126,6 +224,7 @@ df = data.frame(lat=runif(10, 38,40), long=-runif(10, 104,106),
                 line=sample(1:3, 10,replace=TRUE))
 OSMMap(df)
 OSMMap(df, size='size', color='color')
+plot(OSMMap(df))
 
 dualMap = (addLayers(OSMMap(df, size='size', color='color'),
                      linePlot))
@@ -227,11 +326,24 @@ prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE fecha = '2014-08-
 prueba <- rimpala.query("SELECT DISTINCT identif FROM md_trafico_madrid LIMIT 100")
 prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"PM20742\" ORDER BY fecha LIMIT 100")
 prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"PM3856\" ORDER BY fecha LIMIT 100")
-prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"3856\" ORDER BY fecha LIMIT 100")
-prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"41054\" AND fecha > \"2012-12-31\" AND fecha < \"2014-09-29\" ORDER BY fecha LIMIT 100")
+prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"PM20742\" ORDER BY fecha LIMIT 100")
+prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"PM20742\" AND fecha > \"2012-12-31\" AND fecha < \"2013-01-03\" ORDER BY fecha")
+prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"PM20742\" AND fecha >= \"2013-12-31\" AND fecha < \"2014-01-03\" ORDER BY fecha")
 
 prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"41054\" AND fecha > \"2012-12-31\" ORDER BY fecha LIMIT 100")
 prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"41054\" AND fecha > \"2012-12-17\" ORDER BY fecha LIMIT 100")
+prueba <- rimpala.query("SELECT * FROM md_trafico_madrid WHERE identif = \"41054\" AND fecha > \"2014-06-20\" ORDER BY fecha LIMIT 100")
+
+
+prueba <- rimpala.query("SELECT intensidad, fecha FROM md_trafico_madrid WHERE  identif = \"PM20742\" AND fecha > \"2014-06-20\" and fecha < \"2014-06-30\" order by fecha")
+prueba <- rimpala.query("SELECT sum(intensidad) FROM md_trafico_madrid WHERE fecha > \"2014-06-20\" and fecha < \"2014-06-23\" ")
+prueba <- rimpala.query("SELECT identif, sum(intensidad) as suma FROM md_trafico_madrid WHERE fecha > \"2014-06-20\" and fecha < \"2014-06-23\" group by identif order by suma desc")
+
+# one day
+prueba <- rimpala.query("SELECT identif, sum(vmed) as vmed, sum(intensidad) as intensidad FROM md_trafico_madrid WHERE fecha > \"2014-06-20\" and fecha < \"2014-06-23\" group by identif order by intensidad desc")
+
+# one month
+prueba <- rimpala.query("SELECT identif, sum(vmed) as vmed, sum(intensidad) as intensidad FROM md_trafico_madrid WHERE fecha > \"2014-06-20\" and fecha < \"2014-06-23\" group by identif order by intensidad desc")
 
 # 3846 3847 3848 3849 3850 3851 3852 3853 3854 3855 3856
 rimpala.close() #cierras la conexion

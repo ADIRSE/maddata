@@ -65,7 +65,7 @@ getAytoAQData <- function(month, year) {
 # devuelve los datos mensuales por horas
 # getAQData <- function(fecha=mes) {
 # añadir + contaminantes
-getAQData <- function() {
+getFixedAQData <- function() {
   input_file <- paste(getwd(), '/data/AQ_SEP2014_28079004.csv', sep='')
   AQdata <- read.csv(input_file, sep=',', dec = ".", header=T)
 
@@ -86,6 +86,7 @@ SetLocale <- function(loc) {
 #   Sys.setlocale("LC_TIME", "English")  
   Sys.setlocale(loc)
 }
+
 getAQPlot <- function(aq_data) {
   
   plot <- ggplot(aq_data, aes(x=hora, y=NO2)) + 

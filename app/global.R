@@ -8,12 +8,59 @@ require(downloader)
 library(RCurl)
 require(rJava)
 library(RImpala)
+require(lubridate)
+library(openair)
 
 #######################
 # GLOBAL SETTINGS
 #######################
 PATH_RIMPALA_LIB <- "../lib/impala/impala-jdbc-0.5-2/"
 
+num_decimals <- 3
+# load traffic measure  points
+input_file <- paste(getwd(), '/data/PUNTOS_MEDIDA_TRAFICO_2014_01_23_FIXED.csv', sep='')
+l_traffic_measure_points <- read.csv2(input_file)
+df_traffic_measure_points <- as.data.frame(l_traffic_measure_points)
+df_traffic_measure_points$Long <- as.numeric(as.character(df_traffic_measure_points$Long))
+df_traffic_measure_points$Lat <- as.numeric(as.character(df_traffic_measure_points$Lat))
+df_traffic_measure_points$Long <- round(df_traffic_measure_points$Long, digits = num_decimals)
+df_traffic_measure_points$Lat <- round(df_traffic_measure_points$Lat, digits = num_decimals)
+
+names(df_traffic_measure_points)
+names(df_traffic_measure_points) <- c('id', 'tipo', 'code', 'name', 'x', 'y', 'long', 'lat')
+
+# get traffic names
+# traffic_points_choices <- getTrafficPointsChoicesImpala()[[1]]
+traffic_points_choices  <- sort(df_traffic_measure_points$name, decreasing = FALSE)
+# remove_choices <- c(as.vector(traffic_points_choices[grepl("^04", traffic_points_choices)]),
+#                     as.vector(traffic_points_choices[grepl("^03", traffic_points_choices)])
+#                   )
+# 
+# length(as.vector(all_traffic_points_choices[grepl("^04", all_traffic_points_choices)]))
+# traffic_points_choices <- setdiff(all_traffic_points_choices, remove_choices)
+
+l_airq_measure_points <- read.csv2('data/est_airq_madrid.csv')
+df_airq_measure_points <- as.data.frame(l_airq_measure_points)
+df_airq_measure_points$Long2 <- as.numeric(as.character(df_airq_measure_points$Long2))
+df_airq_measure_points$Lat2 <- as.numeric(as.character(df_airq_measure_points$Lat2))
+df_airq_measure_points$Long2 <- round(df_airq_measure_points$Long2, digits = num_decimals)
+df_airq_measure_points$Lat2 <- round(df_airq_measure_points$Lat2, digits = num_decimals)
+
+# fix air station codes
+df_airq_measure_points$Id <- sapply(df_airq_measure_points$Id, function(x) fixStationCodes(x))
+
+# get air quality station names
+# traffic_points_choices <- getTrafficPointsChoicesImpala()[[1]]
+airq_measure_choices  <- sort(df_airq_measure_points$Estacion, decreasing = FALSE)
+
+# madrid_aq_sites <- airbaseInfo(code = airbaseFindCode(country = c("ES"), 
+#                                                       city = "madrid"), 
+#                                instrument = FALSE)
+
+pollutants <- read.csv(paste(getwd(), '/data/pollutants.csv', sep=''), sep=',', dec = ".", header=T)
+
+input_data_file <- paste(getwd(), '/data/airq/', 'airq_ano_14.csv', sep='') # fichero anual
+airq_data_2014 <- read.table(input_data_file, sep=',', dec = ".", header=T)
 
 #######################
 # GLOBAL FUNCS
@@ -29,7 +76,6 @@ connectImpala <- function(){
   # connect
   rimpala.connect("54.171.4.239", port = "21050", principal = "user=guest;password=maddata")
   rimpala.usedatabase("bod_pro")
-  
 }
 
 disconnectImpala <- function(){
@@ -79,81 +125,55 @@ getImpalaQuery <- function(identif = 0, date_start = 0, date_end = 0){
 
 getImpalaData <- function(query){
   data <- rimpala.query(query)
-#   typeof(data)
-#   head(data)
   data
 }
 
-## @knitr getData
-# getData <- function(network = 'citibikenyc'){
-#   require(httr)
-#   url = sprintf('http://api.citybik.es/%s.json', network)
-#   bike = content(GET(url))
-#   lapply(bike, function(station){within(station, { 
-#     fillColor = cut(
-#       as.numeric(bikes)/(as.numeric(bikes) + as.numeric(free)), 
-#       breaks = c(0, 0.20, 0.40, 0.60, 0.80, 1), 
-#       labels = brewer.pal(5, 'RdYlGn'),
-#       include.lowest = TRUE
-#     ) 
-#     popup = iconv(whisker::whisker.render(
-#       '<b>{{name}}</b><br>
-#         <b>Free Docks: </b> {{free}} <br>
-#          <b>Available Bikes:</b> {{bikes}}
-#         <p>Retreived At: {{timestamp}}</p>'
-#     ), from = 'latin1', to = 'UTF-8')
-#     latitude = as.numeric(lat)/10^6
-#     longitude = as.numeric(lng)/10^6
-#     lat <- lng <- NULL})
-#   })
-# }
+getSUMsDataTable <- function(date) {
+  
+  month_start <- as.Date(date)
+  day(month_start) <- 1
+  
+  month_end <- as.Date(date)
+  day(month_end) <- 1
+  month(month_end) <- month(month_end) + 1
 
+  #   month_name <- strptime(date, format = "%M")
+  #   print(month_name)
+
+  #   sums_data <- rimpala.query("SELECT identif, sum(vmed) as vmed, sum(intensidad) as intensidad FROM md_trafico_madrid WHERE fecha >= \"2014-06-20\" and fecha < \"2014-06-23\" group by identif order by intensidad desc")
+  query <- paste("SELECT identif, avg(vmed) as velocidad_media, avg(carga) as carga_media, sum(intensidad) as intensidad_total FROM md_trafico_madrid WHERE fecha >= \"",
+                             month_start,
+                             "\" and fecha < \"",
+                             month_end,
+                             "\" group by identif order by carga_media desc",
+                             sep = '')
+  sums_data <- rimpala.query(query)
+  sums_data
+}
 
 getTrafficPointsChoicesImpala <- function(limit = 0) {
-  connectImpala()
-  choices <- rimpala.query("SELECT DISTINCT identif FROM md_trafico_madrid LIMIT 100")
-  #   order by rand()
-  disconnectImpala()
+  choices <- rimpala.query("SELECT DISTINCT identif FROM md_trafico_madrid")
   choices
 }
 
-
-getTrafficPointsChoices <- function(limit = 0) {
-  num_decimals <- 3
-  # load traffic measure  points
-  input_file <- paste(getwd(), '/app/data/PUNTOS_MEDIDA_TRAFICO_2014_01_23_FIXED.csv', sep='')
-  l_traffic_measure_points <- read.csv2(input_file)
-  head(l_traffic_measure_points)
-  df_traffic_measure_points <- as.data.frame(l_traffic_measure_points)
-  names(df_traffic_measure_points)
-  names(df_traffic_measure_points) <- c('id', 'tipo', 'code', 'name', 'x', 'y', 'long', 'lat')
-#   names <- df_traffic_measure_points$NOMBRE.C.254
-#   names <- df_traffic_measure_points$IDELEM.N.10.0
-#   choices <- df_traffic_measure_points$name
-
-  choices <- df_traffic_measure_points$id
-  
-  if (limit == 0)
-    return (choices)
-  else
-    return (choices[1:limit,])
+getIDTrafPoint <- function(name){
+  code <- df_traffic_measure_points[df_traffic_measure_points$name == name, 3]
+  code
 }
 
-getTrafficPoints <- function(limit = 0) {
-  num_decimals <- 3
-  # load traffic measure  points
-  input_file <- paste(getwd(), '/data/PUNTOS_MEDIDA_TRAFICO_2014_01_23_FIXED.csv', sep='')
-  l_traffic_measure_points <- read.csv2(input_file)
-  df_traffic_measure_points <- as.data.frame(l_traffic_measure_points)
-  df_traffic_measure_points$Long <- as.numeric(as.character(df_traffic_measure_points$Long))
-  df_traffic_measure_points$Lat <- as.numeric(as.character(df_traffic_measure_points$Lat))
-  df_traffic_measure_points$Long <- round(df_traffic_measure_points$Long, digits = num_decimals)
-  df_traffic_measure_points$Lat <- round(df_traffic_measure_points$Lat, digits = num_decimals)
-  
-  if (limit == 0)
-    return (df_traffic_measure_points)
-  else
-    return (df_traffic_measure_points[1:limit,])
+
+# load air quality measure points
+fixStationCodes <- function(code) {
+  #   code <- as.character(code)
+  if (code<10) {
+    station_code <- paste('2807900',
+                          code, sep='')
+  }
+  else {
+    station_code <- paste('280790',
+                          code, sep='')
+  }
+  station_code
 }
 
 getAirQualityPoints <- function() {
@@ -171,7 +191,7 @@ getAirQualityPoints <- function() {
 getKMLData <- function () {
 
   kml_url = 'http://datos.madrid.es/egob/catalogo/202088-0-trafico-camaras.kml'
-  kml_file = '/data/202088-0-trafico-camaras.kml'
+  kml_file = 'data/202088-0-trafico-camaras.kml'
   if (file.exists(kml_file)) {
     download(url=kml_url, destfile = kml_file)
   }
@@ -194,6 +214,8 @@ getCenter <- function(nm, networks){
   return(list(lat = lat, lng = lng))
 }
 
+
+
 plotMap <- function(num_measure_points = nrow(df_traffic_measure_points), 
                     width = 1600, 
                     height = 800){
@@ -213,62 +235,60 @@ plotMap <- function(num_measure_points = nrow(df_traffic_measure_points),
   #   map$addKML(kml_file)
   #   map$save('index.html', cdn = TRUE)
   
-  #   get data points
-  df_traffic_measure_points <- getTrafficPoints(num_measure_points)
-  df_airq_measure_points <- getAirQualityPoints()
-
-  data_ <- df_traffic_measure_points[,c("Lat", "Long")]
+  #   filter data points
+  sub_traffic_measure_points <- df_traffic_measure_points[1:num_measure_points,]
+  #   df_airq_measure_points <- getAirQualityPoints()
+  
+  data_ <- sub_traffic_measure_points[,c("lat", "long")]
   data_ <- addColVis(data_)
-  colnames(data_) <- c('latitude', 'longitude', 'fillColor')
+  colnames(data_) <- c('lat', 'lng', 'fillColor')
   
   output_geofile <- paste(getwd(), '/data/', sep='')
-
+  
   #   citybikes example
   #   data_ <- getData(network); center_ <- getCenter(network, networks)
   #   center_ <- getCenter(network, networks)    
   #   another example
   #   names(data_) <- c('lat', 'lng', 'fillColor')
   #   map$geocsv(data_)
-#   print (leafletR::toGeoJSON(data_, 
-#                              #                             lat.lon = c('Lat', 'Long'),
-#                              dest=))
+  #   print (leafletR::toGeoJSON(data_, 
+  #                              #                             lat.lon = c('Lat', 'Long'),
+  #                              dest=))
+  
+  # print(head(data_))
+  
   map$geoJson(
-        leafletR::toGeoJSON(data_, 
-#                             lat.lon = c('Lat', 'Long'),
-                            dest=output_geofile),
-        onEachFeature = '#! function(feature, layer){
-                              layer.bindPopup(feature.properties.popup)
-                            } !#',
-        pointToLayer =  "#! function(feature, latlng){
-                            return L.circleMarker(latlng, {
-                              radius: 6,
-                              fillColor: feature.properties.fillColor || 'blue',
-                              color: '#333',
-                              weight: 1,
-                              fillOpacity: 0.8
-                            })
-                          } !#")
-#   )
-
+    leafletR::toGeoJSON(data_, 
+                        lat.lon = c('lat', 'lng'),
+                        dest=output_geofile),
+    pointToLayer =  "#! function(feature, latlng){
+                    return L.circleMarker(latlng, {
+                            radius: 6,
+                            fillColor: 'green',
+                            color: '#333',
+                            weight: 1,
+                            fillOpacity: 0.8
+                    })
+                    } !#"
+    )
+  
   # append markers and popup texts
   for(i in 1:num_measure_points) {
     html_text <- paste("<h6> Punto de medida del tráfico </h6>")
-    html_text <- paste(html_text, "<p>",  df_traffic_measure_points$NOMBRE.C.254[i]," </p>")
-    map$marker(c(df_traffic_measure_points$Lat[i], 
-                  df_traffic_measure_points$Long[i]), 
+    html_text <- paste(html_text, "<p>",  sub_traffic_measure_points$name[i]," </p>")
+    map$marker(c(sub_traffic_measure_points$lat[i], 
+                 sub_traffic_measure_points$long[i]),
+               bindPopup = html_text)
+  }
+  
+  # append markers and popup texts
+  for(i in 1:nrow(df_airq_measure_points)) {
+    html_text <- paste("<h6> Estación de calidad del Aire </h6>")
+    html_text <- paste(html_text, "<p>",  df_airq_measure_points$Estacion[i]," </p>")
+    map$marker(c(df_airq_measure_points$Lat2[i], 
+                  df_airq_measure_points$Long2[i]),
                 bindPopup = html_text)
   }
-
-#   # append markers and popup texts
-#   for(i in 1:nrow(df_airq_measure_points)) {
-#     html_text <- paste("<h6> Estación de calidad del Aire </h6>")
-#     html_text <- paste(html_text, "<p>",  df_airq_measure_points$Estacion[i]," </p>")
-#     map$marker(c(df_airq_measure_points$Lat2[i], 
-#                   df_airq_measure_points$Long2[i]),
-#                 bindPopup = html_text)
-# #     map$circle(c(df_airq_measure_points$Lat2[i], 
-# #                  df_airq_measure_points$Long2[i]))
-#   }
 
   map$enablePopover(TRUE)
   map$fullScreen(TRUE)
@@ -283,28 +303,9 @@ getTrafficSeriesChart <- function (traf_point = 'PM20742', date_start, date_end)
 #   print(date_end)
 #   print("===========")
 
-  #   query <- getImpalaQuery(traf_point)
   query <- getImpalaQuery(traf_point, date_start, date_end)  
-  #   query <- getImpalaQuery(traf_point, date_start)
-  print(query)
 
   # get data from impala
-  connectImpala()
-  data <- getImpalaData(query)
-  disconnectImpala()
-  
-  # get chart
-  m1 <- mPlot(x = 'fecha', y = c('vmed', 'carga'), type = 'Line',
-              data = data)
-  m1$set(pointSize = 0, lineWidth = 1)
-  m1
-  
-  
-  #   mytooltip = "function(item){return item.identif + '\n' + item.fecha + '\n' + item.vmed}"
-  #   p1 <- rPlot(fecha ~ carga, data = data, type = 'point', 
-  #             size = list(const = 2), 
-  #             color = list(const = '#888'), 
-  #             tooltip = mytooltip)
-  #   p1$print('chart1')
-  #   p1
+  data <- getImpalaData(query)  
+  data
 }

@@ -3,10 +3,6 @@ require(rCharts)
 
 connectImpala()
 
-# traffic_points_choices <- getTrafficPointsChoices()
-traffic_points_choices <- getTrafficPointsChoicesImpala()[[1]]
-# traffic_points_choices
-# typeof(traffic_points_choices)
 
 shinyUI(pageWithSidebar( 
     headerPanel("MADtraffic"),
@@ -17,33 +13,67 @@ shinyUI(pageWithSidebar(
       sliderInput("num_traffic_points", "Número ptos. tráfico:",
                   min = 10, max = 1000, value = 200),
       
-      # Range of dates to study data
-      dateRangeInput("date_range", "Rango de fechas:",
-                     start = "2014-01-01",
-                     end = "2014-09-30"),
+      # day of analysis
+      dateInput("day_selection", "Selecciona un día:", value = "2014-05-01"
+                , min = "2013-01-01"
+                , max = "2014-07-01"),
       
-#       selectInput("traf_point", "Punto medida de tráfico", as.list(traffic_points_choices)),
-      selectInput("traf_point", "Punto medida de tráfico", traffic_points_choices)
+      radioButtons("pollutant", "Elige contaminante:",
+                   c("CO" = "CO",
+                     "CO2" = "CO2",
+                     "PM2.5" = "PM2.5",
+                     "PM10" = "PM10",
+                     "NO" = "NO",
+                     "NO2" = "NO2",
+                     "NOx" = "NOx",
+                     "SO2" = "SO2"), 
+                   selected='NO2'),
+      
+#       selectInput("pollutant", "Elige contaminante:",
+#                    pollutants$pollutant, 
+#                    selected='NO2'),
 
-#       selectInput("select", label = h3("Select box"), 
-#                   choices = list("Choice 1" = 1, "Choice 2" = 2,
-#                                  "Choice 3" = 3), selected = 1)
+      checkboxGroupInput("traf_variables", "Variables de Tráfico:",
+                         c("Intensidad" = "intensidad",
+                           "Carga" = "carga",
+                           "Velocidad media" = "vmed"),
+                         selected=c('carga', 'vmed')),
+#       selectInput("traf_point", "Punto medida de tráfico", traffic_points_choices)
+#       selectInput("traf_point", "Punto medida de tráfico", traffic_points_choices, selected = 'BRAVO MURILLO - (AZUCENAS-CONDE VALLELLANO)')
+      selectInput("traf_point", "Punto medida de tráfico", traffic_points_choices, selected = 'PM43221'),
+      
+      selectInput("airq_point", "Estación de calidad del aire", airq_measure_choices, selected = 'Plaza de España')
       
    ),
     
     mainPanel(
       tabsetPanel(
-        tabPanel("Puntos de medida del tráfico y calidad del aire", chartOutput("tab_container_1", 'leaflet')),
-        tabPanel("Tráfico en 1 pto de medida", chartOutput("tab_container_2", 'morris')),
-        tabPanel("Prueba", chartOutput("tab_container_3", 'nvd3')),
+        tabPanel("Puntos de medida del tráfico y calidad del aire", 
+                 includeMarkdown("docs/desc_map_points.md"),
+                 chartOutput("tab_container_1", 'leaflet')),
         
-#         tabPanel("Prueba", chartOutput("tab_container_4", 'polycharts')),
-        tabPanel("tab_container_4", plotOutput("tab_container_4")),
+#         tabPanel("Puntos de medida", 
+#                  htmlOutput("tab_container_1_bis")),
 
-#         tabPanel("Prueba", chartOutput("tab_container_5", 'xcharts'))
-        tabPanel("tab_container_5", plotOutput("tab_container_5")),
-#         tabPanel("tab_container_5", dataTableOutput("tab_container_5")),
-
+          tabPanel("Velocidad media vs Tráfico", 
+                 includeMarkdown("docs/desc_chart_series.md"),
+                 chartOutput("tab_container_2", 'morris')
+                 ),
+        
+        tabPanel("Top medidas de tráfico", 
+                 includeMarkdown("docs/desc_table_top.md"),
+                 dataTableOutput("tab_container_3")
+        ),
+        
+        tabPanel("Contaminación mensual", 
+                 includeMarkdown("docs/desc_chart_pollution.md"),
+                 plotOutput("tab_container_4")
+                 ),
+        tabPanel("Tabla de contaminación", 
+                 includeMarkdown("docs/desc_table_pollution.md"),
+                 dataTableOutput("tab_container_5")
+        ),
+        
         tabPanel("Sobre nosotros", includeMarkdown("docs/about_us.md"))
       )
     )

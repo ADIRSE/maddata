@@ -1,8 +1,3 @@
-require(shiny)
-require(rCharts)
-
-connectImpala()
-
 
 shinyUI(pageWithSidebar( 
     headerPanel("MADtraffic"),

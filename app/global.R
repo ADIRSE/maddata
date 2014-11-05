@@ -1,3 +1,4 @@
+require(shiny)
 require(RJSONIO)
 require(rCharts)
 require(RColorBrewer)
@@ -8,13 +9,19 @@ require(downloader)
 library(RCurl)
 require(rJava)
 library(RImpala)
-require(lubridate)
 library(openair)
+require(lubridate)
+# library(OpenStreetMapR)
+
+# source("global.R")
+source("some_charts.R")
+source("airq.R")
+
+connectImpala()
 
 #######################
 # GLOBAL SETTINGS
 #######################
-PATH_RIMPALA_LIB <- "../lib/impala/impala-jdbc-0.5-2/"
 
 num_decimals <- 3
 # load traffic measure  points

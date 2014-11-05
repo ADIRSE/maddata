@@ -1,12 +1,3 @@
-library(ggplot2)
-require(shiny)
-require(rCharts)
-require(lubridate)
-library("OpenStreetMapR")
-
-# source("global.R")
-source("some_charts.R")
-source("airq.R")
 
 shinyServer(function(input, output) {
   

@@ -158,17 +158,17 @@ getCenter <- function(nm, networks){
 
 plotMap <- function(num_measure_points = nrow(df_traffic_measure_points), 
                     width = 1600, 
-                    height = 800){
+                    height = 800) {
     
     map <- Leaflet$new()
     map$tileLayer(provide='Stamen.TonerLite')
     
     #   init map
-    map$setView(c(40.41, -3.70), zoom = 12, size = c(20, 20))
-
+    #     map$setView(c(40.41, -3.70), zoom = 12, size = c(20, 20))
+    map$setView(c(40.41, -3.70), zoom = 12)
+    
     #   filter data points
     sub_traffic_measure_points <- df_traffic_measure_points[1:num_measure_points,]
-    #   df_airq_measure_points <- getAirQualityPoints()
     
     data_ <- sub_traffic_measure_points[,c("lat", "long")]
     data_ <- addColVis(data_)

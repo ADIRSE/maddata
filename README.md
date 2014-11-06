@@ -33,7 +33,11 @@ install_github('ramnathv/rCharts')
 install.packages("openair", dep=TRUE)
 install.packages("lubridate")
 install.packages("markdown")
+install.packages("meteoForcast")
 
+
+install_github('ramnathv/slidify')
+install_github('ramnathv/slidifyLibraries')
 
 
 * install.packages("openair", dep=TRUE)

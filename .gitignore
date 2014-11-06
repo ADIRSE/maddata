@@ -8,17 +8,20 @@
 # lib
 .jar
 
+# Other data files
+.geojson
+
 
 # R data files from past sessions
 .Rdata
 .RData
 .Rproj.user
-deploy.R
+
 
 # About Shinyapps deployment
 shinyapps
+deploy.R
 
 # Other files
 shit.R
-# app/data/airq/
 .png

@@ -20,5 +20,5 @@ shinyapps
 
 # Other files
 shit.R
-app/data/airq/
+app/data/
 .png

@@ -27,7 +27,12 @@ library(openair)
 
 ### Installation notes
 You will need to install the following external packages:
-* install.packages("openair", dep=TRUE)
+install.packages('devtools'); 
+require(devtools)
+install_github('ramnathv/rCharts')
+install.packages("openair", dep=TRUE)
+
+
 * install.packages("openair", dep=TRUE)
 * install.packages("openair", dep=TRUE)
 

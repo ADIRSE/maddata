@@ -1,4 +1,12 @@
 
+installed.packages(RImpala)
+
+
+
+##########
+
+##########
+# CODIGO JL PLOT AQ DATA + PARSER TXT2CSV
 ##########
 library(ggplot2)
 

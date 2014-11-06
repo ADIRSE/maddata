@@ -136,48 +136,4 @@ shinyServer(function(input, output) {
                     search = list(regex = TRUE)
                     ),
                 searchDelay = 500)
-
-
-#   
-#   output$tab_container_5 <- renderPlot({
-#     
-#     ## Check input
-#     aqdata_path <- "data/airq/aqdata_2014_08.rda"    
-# 
-#     if (file.exists(aqdata_path)){
-#       ## Use preloaded data
-#       #       saveRDS (df, file="mytweets.rds")
-#       aqdata <- readRDS(aqdata_path)      
-#       #       load("./demo/demo_london_eye.rda")      
-#       
-#     } else {
-#       #       Sys.Date()
-#       
-#       ## Use reactive function
-#       #       df <- create.df()
-#       
-#       #       date_selected <- input$date_range[1]
-#       #       date_selected <- as.Date(input$date_range[1])
-#       date_selected <- as.Date(input$day_selection)      
-#       month <- tolower(format(date_selected, format = "%b"))
-#       year <- format(date_selected, format = "%y")
-#       input_aq_data_file <- paste("data/airq", 
-#                                   month,
-#                                   "_mo",
-#                                   year,
-#                                   ".txt", sept = '')
-#       print(input_aq_data_file)
-#       
-# #       month <- substr(strptime(date_selected, "%Y-%m-%d"), 6, 7)
-#       
-#       ## Display df
-#       aq_data <- getAQData()
-#     }
-# 
-#     aq_plot <- getAQPlot(aq_data)
-#     print(aq_plot)
-#   
-#   }, height = 350)
-
-
 })

@@ -103,23 +103,19 @@ shinyServer(function(input, output) {
     pollutant <- pollutants[pollutants$pollutant==input$pollutant,]$code
 
     sub_airq_data <- subset(airq_data_2014, Code == station_code & Par == pollutant & mes == month)
-
+    
     p <- ggplot(data=sub_airq_data, aes(x=as.numeric(hora), 
                                         y=Value, 
                                         group=as.numeric(dia), 
                                         color=dia)) + 
-      geom_line() + 
-      #       geom_hline(yintercept=200, color='red') + 
-      xlim(1, 24)
+          geom_line() + 
+          #       geom_hline(yintercept=200, color='red') + 
+          xlim(1, 24)
     
     p <- p + xlab('Hora') + ylab('Nivel contaminante') + theme(legend.position="none")
     
     print(p)
     
-  })
-
-  output$tab_container_4 <- renderChart2({
-    getScatterChart(input)
   })
   
 #   output$tab_container_4_bis <- renderPlot({

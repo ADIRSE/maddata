@@ -17,19 +17,6 @@ getSeriesChart <- function () {
 
 }
 
-#   url <- 'http://datune.maddata.es:9090/BigOpenApi/probarRecurso?dsTabla=md_trafico_madrid'
-#   data <- getBOAData(url)
-#   data <- as.data.frame(data$Result)
-#   typeof(data)
-#   head(data)
-#   str(data)
-#   str(data$Result)
-#   str(y)
-#   data[1]
-#   parsedData <- transform(data, date = as.character(fecha))
-#   head(parsedData, n = 2)
-
-
 getNVD3test <- function () {
     hair_eye_male <- subset(as.data.frame(HairEyeColor), Sex == "Male")
     n1 <- nPlot(Freq ~ Hair, group = "Eye", data = hair_eye_male, type = 'multiBarChart')
@@ -42,11 +29,6 @@ getScatterChart <- function (input){
               facet = "Species", type = 'point')
   p1$addParams(dom = 'myChart')
   p1
-}
-
-getRPlott <- function () {
-  
-
 }
 
 getxChart <- function () {
